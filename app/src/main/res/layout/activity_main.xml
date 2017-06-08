@@ -4,15 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="8dp"
     tools:context="com.team14.gpslogger.MainActivity">
+
+
+    <TextView
+        android:id="@+id/text_latitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_latitude"
+        android:paddingTop="16dp"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/text_longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_longitude"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/text_latitude"
+        app:layout_constraintStart_toStartOf="@+id/text_latitude"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/disp_lat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/text_latitude"
+        app:layout_constraintStart_toEndOf="@+id/text_longitude"
+        tools:layout_editor_absoluteX="66dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/disp_long"
+        android:text="test1"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layout_constraintStart_toStartOf="@id/disp_lat"
+        app:layout_constraintBaseline_toBaselineOf="@+id/text_longitude"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/text_longitude"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/btn_start_service"
+        android:onClick="startService"
+        android:id="@+id/btn_start" />
+
+    <Button
+        android:id="@+id/btn_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_update_value"
+        app:layout_constraintTop_toBottomOf="@+id/btn_start"
+        app:layout_constraintStart_toStartOf="parent"
+        android:onClick="updateValue"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_stop_service"
+        app:layout_constraintTop_toBottomOf="@+id/btn_update"
+        app:layout_constraintStart_toStartOf="parent"
+        android:onClick="stopService"
+        tools:layout_editor_absoluteX="0dp" />
+
 
 </android.support.constraint.ConstraintLayout>
