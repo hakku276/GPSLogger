@@ -6,4 +6,9 @@
     <string name="btn_stop_service">Stop Service</string>
     <string name="btn_fake_it">Push Fake GPS</string>
     <string name="btn_update_value">Update Value</string>
+    <string name="text_unavailable">Unavailable</string>
+    <string name="text_location">Location Information</string>
+    <string name="text_speed">Speed:</string>
+    <string name="text_distance">Distance:</string>
+    <string name="txt_allow_auto_update">Automatically Update Values</string>
 </resources>

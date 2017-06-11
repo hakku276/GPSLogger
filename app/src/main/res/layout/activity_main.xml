@@ -1,81 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
-    tools:context="com.team14.gpslogger.MainActivity">
+    android:orientation="vertical"
+    android:padding="@dimen/app_default_padding">
 
-
-    <TextView
-        android:id="@+id/text_latitude"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/text_latitude"
-        android:paddingTop="16dp"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="0dp" />
+        android:background="@drawable/custom_border">
 
-    <TextView
-        android:id="@+id/text_longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_longitude"
-        android:paddingTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/text_latitude"
-        app:layout_constraintStart_toStartOf="@+id/text_latitude"
-        tools:layout_editor_absoluteX="0dp" />
+        <TextView
+            android:id="@+id/txt_loc_inf"
+            style="?android:textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/text_location"
+            android:textAlignment="center" />
 
-    <TextView
-        android:id="@+id/disp_lat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/text_latitude"
-        app:layout_constraintStart_toEndOf="@+id/text_longitude"
-        tools:layout_editor_absoluteX="66dp" />
+        <ImageButton
+            android:id="@+id/btn_update"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_sync_black"
+            android:contentDescription="@string/btn_update_value"
+            android:onClick="updateValue" />
 
-    <TextView
-        android:layout_width="wrap_content"
+        <Space
+            android:id="@+id/spacer"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/app_default_padding"
+            android:layout_below="@+id/btn_update" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spacer">
+
+            <TextView
+                android:id="@+id/text_latitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_latitude"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/disp_lat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/app_default_padding"
+                android:paddingStart="@dimen/app_default_padding"
+                android:text="@string/text_unavailable"
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_latitude"
+                app:layout_constraintStart_toStartOf="@+id/disp_long"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/text_longitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_longitude"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_latitude" />
+
+            <TextView
+                android:id="@+id/disp_long"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/app_default_padding"
+                android:paddingStart="@dimen/app_default_padding"
+                android:text="@string/text_unavailable"
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_longitude"
+                app:layout_constraintStart_toEndOf="@+id/text_longitude" />
+
+            <TextView
+                android:id="@+id/text_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_speed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_longitude" />
+
+            <TextView
+                android:id="@+id/disp_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/app_default_padding"
+                android:paddingStart="@dimen/app_default_padding"
+                android:text="@string/text_unavailable"
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_speed"
+                app:layout_constraintStart_toEndOf="@+id/text_longitude" />
+
+            <TextView
+                android:id="@+id/text_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_distance"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_speed" />
+
+            <TextView
+                android:id="@+id/disp_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="@dimen/app_default_padding"
+                android:paddingStart="@dimen/app_default_padding"
+                android:text="@string/text_unavailable"
+                app:layout_constraintBaseline_toBaselineOf="@+id/text_distance"
+                app:layout_constraintStart_toEndOf="@+id/text_longitude" />
+        </android.support.constraint.ConstraintLayout>
+
+    </RelativeLayout>
+
+    <CheckBox
+        android:id="@+id/chk_auto_update"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/disp_long"
-        android:text="test1"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:layout_constraintStart_toStartOf="@id/disp_lat"
-        app:layout_constraintBaseline_toBaselineOf="@+id/text_longitude"/>
+        android:onClick="enableDisableAutoUpdate"
+        android:text="@string/txt_allow_auto_update"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/btn_start_stop"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/text_longitude"
-        app:layout_constraintStart_toStartOf="parent"
-        android:text="@string/btn_start_service"
-        android:onClick="startService"
-        android:id="@+id/btn_start" />
+        android:onClick="toggleServiceStatus"
+        android:text="@string/btn_start_service" />
 
-    <Button
-        android:id="@+id/btn_update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_update_value"
-        app:layout_constraintTop_toBottomOf="@+id/btn_start"
-        app:layout_constraintStart_toStartOf="parent"
-        android:onClick="updateValue"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <Button
-        android:id="@+id/btn_stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_stop_service"
-        app:layout_constraintTop_toBottomOf="@+id/btn_update"
-        app:layout_constraintStart_toStartOf="parent"
-        android:onClick="stopService"
-        tools:layout_editor_absoluteX="0dp" />
-
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>

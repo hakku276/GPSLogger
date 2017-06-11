@@ -15,34 +15,53 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * The GPX Log Stream
  * Created by aanal on 6/8/17.
  */
 
-public class LogStream {
+class LogStream {
 
+    /**
+     * The tag for logcat
+     */
     private static final String TAG = LogStream.class.getName();
 
+    /**
+     * XML Header
+     */
     private static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
 
+    /**
+     * Date formatter for logging the date and time
+     */
     private static final SimpleDateFormat POINT_DATE_FORMATTER = new SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
 
+    /**
+     * GPX standard meta data
+     */
     private static final String TAG_GPX = "<gpx"
             + " xmlns=\"http://www.topografix.com/GPX/1/1\""
             + " version=\"1.1\""
             + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
             + " xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">";
 
+    /**
+     * The file writer that handles writing the file
+     */
     private FileWriter fw;
 
-    public LogStream(Context context) throws IOException {
+    LogStream(Context context) throws IOException {
         File sd = context.getExternalFilesDir(null);
         File logDir = new File(sd,"/GPSLogger");
+
+        //create the log dir if it doesn't exist
         if(!logDir.exists() && !logDir.mkdirs()){
             Log.e(TAG, "LogStream: Could not Open File To write");
             throw new IllegalStateException("Cannot make log directory");
         }
-        File configFile = new File(logDir,"config.conf");
+        //the config file to hold the current index of the log file
+        File configFile = new File(logDir,"config");
         File logFile = null;
         if(!configFile.exists()){
             //config file does not exist, new configuration
@@ -52,12 +71,15 @@ public class LogStream {
             stream.flush();
             stream.close();
         } else {
-            //config file exists
+            //config file exists read the current index of the log file
             FileInputStream stream = new FileInputStream(configFile);
             int count =  stream.read();
             stream.close();
-            logFile = new File(logDir, String.format("log-%d.gpx",count));
-            //update the config count
+
+            //the log file
+            logFile = new File(logDir, String.format(Locale.getDefault(),"log-%d.gpx",count));
+
+            //update the index count
             count++;
             FileOutputStream outStream = new FileOutputStream(configFile);
             outStream.write(count);
@@ -65,6 +87,7 @@ public class LogStream {
             outStream.close();
         }
 
+        //write the logfile with initial data
         fw = new FileWriter(logFile);
 
         fw.write(XML_HEADER + "\n");
@@ -74,7 +97,12 @@ public class LogStream {
         fw.write("\t\t" + "<trkseg>" + "\n");
     }
 
-    public void log(Location data) throws IOException {
+    /**
+     * Log the location data
+     * @param data the location data
+     * @throws IOException if the data could not be written onto the file
+     */
+    void log(Location data) throws IOException {
         if(fw != null){
             String out = ("\t\t\t" + "<trkpt lat=\""
                     + data.getLatitude() + "\" " + "lon=\""
@@ -91,14 +119,24 @@ public class LogStream {
                     "\t\t\t" + "</trkpt>" + "\n";
 
             fw.write(out);
+        } else {
+            throw new IllegalStateException("File Writer is null");
         }
     }
 
-    public void closeLog() throws IOException {
-        fw.write("\t\t" + "</trkseg>" + "\n");
-        fw.write("\t" + "</trk>" + "\n");
-        fw.write("</gpx>");
-        fw.close();
+    /**
+     * Close the log file, call to this is always necessary to properly maintain the log file
+     * @throws IOException if the file could not be written
+     */
+    void closeLog() throws IOException {
+        if(fw != null) {
+            fw.write("\t\t" + "</trkseg>" + "\n");
+            fw.write("\t" + "</trk>" + "\n");
+            fw.write("</gpx>");
+            fw.close();
+        } else {
+            throw new IllegalStateException("File Writer is null");
+        }
     }
 
 }

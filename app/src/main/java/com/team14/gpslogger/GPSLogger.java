@@ -23,10 +23,23 @@ import java.io.IOException;
 
 public class GPSLogger extends Service implements LocationListener {
     private static final String TAG = GPSLogger.class.getName();
+    /**
+     * Minimum distance Extra to be added to the intent while starting this service
+     */
     private static final String EXTRA_DISTANCE = "EXTRA_DISTANCE";
+
+    /**
+     * Minimum time Extra to be added to the intent while starting this service
+     */
     private static final String EXTRA_TIME = "EXTRA_TIME";
 
+    /**
+     * Defines the minimum time the system should provide location updates
+     */
     private static final long MIN_TIME = 1000;
+    /**
+     * Defines the minimum distance in which the system should provide location updates
+     */
     private static final float MIN_DISTANCE = 10;
 
     /**
@@ -49,6 +62,9 @@ public class GPSLogger extends Service implements LocationListener {
      */
     private double averageSpeed = 0.0;
 
+    /**
+     * The GPS Position logging stream
+     */
     private LogStream logStream;
 
     @Override
@@ -67,10 +83,15 @@ public class GPSLogger extends Service implements LocationListener {
         //reset system every time a start command is issued
         distanceTravelled = 0.0;
         averageSpeed = 0.0;
+
+        //get the location manager and request for location updates
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager != null) {
+            //set the min distance and min time to defaults
             float minDistance = MIN_DISTANCE;
             long minTime = MIN_TIME;
+
+            //if the intent provides extra data, use them instead of this data
             if (intent != null) {
                 minDistance = intent.getFloatExtra(EXTRA_DISTANCE, MIN_DISTANCE);
                 minTime = intent.getLongExtra(EXTRA_TIME, MIN_TIME);
@@ -111,10 +132,13 @@ public class GPSLogger extends Service implements LocationListener {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy: Stopping service");
+
+        //remove the update request from system
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager != null) {
             locationManager.removeUpdates(this);
         }
+        //close the log file
         if(logStream != null){
             try {
                 logStream.closeLog();
@@ -132,15 +156,23 @@ public class GPSLogger extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        //TODO make calculations here
-        Log.d(TAG, "onLocationChanged: long=" + location.getLongitude() + " lat= " + location.getLatitude());
-        this.location = location;
-        this.averageSpeed = (this.averageSpeed + location.getSpeed())/2.0;
-        try {
-            logStream.log(location);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Some Issue with logging", Toast.LENGTH_SHORT).show();
+        //new location updated
+        if(location != null) {
+            Log.d(TAG, "onLocationChanged: long=" + location.getLongitude() + " lat= " + location.getLatitude());
+            //calculate the average speed
+            Log.d(TAG, "onLocationChanged: Read Average Speed = " + location.getSpeed());
+            this.averageSpeed = (this.averageSpeed + location.getSpeed()) / 2.0;
+            //sum up the distance travelled
+            if(this.location != null) {
+                this.distanceTravelled += location.distanceTo(this.location);
+            }
+            Log.d(TAG, "onLocationChanged: Calculated Average Speed= " + averageSpeed + " Calculated Distance= " + distanceTravelled);
+            this.location = location;
+            try {
+                logStream.log(location);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
