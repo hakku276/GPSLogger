@@ -102,6 +102,10 @@ public class MainActivity extends AppCompatActivity {
                 bindService(intent, mConnection, BIND_AUTO_CREATE);
                 btnStartStop.setText(getString(R.string.btn_stop_service));
                 mRunning = true;
+                // TODO verify this
+                if(chkBoxAutoUpdate.isChecked() && autoUpdateTask == null){
+                    scheduleAutoUpdate();
+                }
             }
         } else {
             Log.d(TAG, "stopService: Stopping Service");
@@ -113,32 +117,39 @@ public class MainActivity extends AppCompatActivity {
                 btnStartStop.setText(getString(R.string.btn_start_service));
                 locationService = null;
                 mRunning = false;
+                if(autoUpdateTask != null){
+                    autoUpdateTask.cancel();
+                }
             }
         }
     }
 
     public void enableDisableAutoUpdate(View v) {
         Log.d(TAG, "enableDisableAutoUpdate: Check box clicked");
-        if (chkBoxAutoUpdate.isChecked()) {
+        if (chkBoxAutoUpdate.isChecked() && mRunning) {
             Log.i(TAG, "enableDisableAutoUpdate: Auto update enabled");
-            autoUpdateTask = new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateValue(null);
-                        }
-                    });
-                }
-            };
-            //start the timer
-            timer.scheduleAtFixedRate(autoUpdateTask, UPDATE_TIME, UPDATE_TIME);
-        } else {
+            scheduleAutoUpdate();
+        } else if(mRunning){
             Log.i(TAG, "enableDisableAutoUpdate: Auto update disabled");
             // the timer should be cancelled
             autoUpdateTask.cancel();
         }
+    }
+
+    private void scheduleAutoUpdate(){
+        autoUpdateTask = new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateValue(chkBoxAutoUpdate);
+                    }
+                });
+            }
+        };
+        //start the timer
+        timer.scheduleAtFixedRate(autoUpdateTask, UPDATE_TIME, UPDATE_TIME);
     }
 
     /**
@@ -156,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
                     dispLong.setText(Double.toString(location.getLongitude()));
                     dispSpeed.setText(Double.toString(locationService.getAverageSpeed()));
                     dispDistance.setText(Double.toString(locationService.getDistanceTravelled()));
-                } else {
+                } else if (v != chkBoxAutoUpdate) {
+                    //if the view that is calling this is not a check box!! check box was sent as param for auto update calls
                     Log.d(TAG, "updateValue: No location till now");
                     Toast.makeText(this, "No Location", Toast.LENGTH_SHORT).show();
                 }

@@ -71,7 +71,7 @@ public class GPSLogger extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         try {
-            logStream = new LogStream(this);
+            logStream = new LogStream();
         } catch (IOException e) {
             e.printStackTrace();
         }

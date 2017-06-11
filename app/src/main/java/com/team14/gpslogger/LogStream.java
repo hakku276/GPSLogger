@@ -2,6 +2,7 @@ package com.team14.gpslogger;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -51,8 +52,9 @@ class LogStream {
      */
     private FileWriter fw;
 
-    LogStream(Context context) throws IOException {
-        File sd = context.getExternalFilesDir(null);
+    LogStream() throws IOException {
+        //File sd = context.getExternalFilesDir(null);
+        File sd = Environment.getExternalStorageDirectory();
         File logDir = new File(sd,"/GPSLogger");
 
         //create the log dir if it doesn't exist
