@@ -1,5 +1,5 @@
 // ILocationService.aidl
-package com.team14.gpslogger;
+package com.team18.gpslogger;
 
 // Declare any non-default types here with import statements
 

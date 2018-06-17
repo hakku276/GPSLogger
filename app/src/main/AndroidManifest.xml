@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.team14.gpslogger">
+    package="com.team18.gpslogger">
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -15,7 +15,6 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -24,9 +23,6 @@
             android:name=".GPSLogger"
             android:enabled="true"
             android:exported="true"></service>
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="de22ab060cf56bb70321ea6562ec745230b9f814" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

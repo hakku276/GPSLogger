@@ -1,4 +1,4 @@
-package com.team14.gpslogger;
+package com.team18.gpslogger;
 
 import android.Manifest;
 import android.app.PendingIntent;
