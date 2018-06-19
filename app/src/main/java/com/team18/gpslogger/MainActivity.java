@@ -1,23 +1,27 @@
 package com.team18.gpslogger;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Environment;
-import android.os.Handler;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
@@ -27,27 +31,36 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
     private static final long UPDATE_TIME = 10000;
-
+    private static final int LOCATION_PERMISSION_REQUEST = 5;
+    private static final String[] LOGGING_TAGS = {
+            MainActivity.class.getName(),
+            GPSLogger.class.getName(),
+            LogStream.class.getName()
+    };
+    private static final char LOGGING_LEVEL = 'D';
     private ILocationService locationService;
     private boolean mRunning;
-
     private TextView dispLat;
     private TextView dispLong;
     private TextView dispSpeed;
     private TextView dispDistance;
     private CheckBox chkBoxAutoUpdate;
     private Button btnStartStop;
-
     private Timer timer;
     private TimerTask autoUpdateTask;
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            Log.d(TAG, "onServiceConnected: Service connected");
+            locationService = ILocationService.Stub.asInterface(iBinder);
+        }
 
-    private static final String[] LOGGING_TAGS = {
-            MainActivity.class.getName(),
-            GPSLogger.class.getName(),
-            LogStream.class.getName()
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            Log.d(TAG, "onServiceDisconnected: Service disconnected");
+            locationService = null;
+        }
     };
-
-    private static final char LOGGING_LEVEL = 'D';
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if (isPermissionGranted()) {
+            Log.d(TAG, "onStart: Permission has been granted");
+        }
+
         if (mRunning) {
             Intent intent = new Intent(this, GPSLogger.class);
             bindService(intent, mConnection, BIND_AUTO_CREATE);
@@ -80,6 +97,23 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(intent);
         }
+    }
+
+    private boolean isPermissionGranted() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "onCreate: Do not have permissions");
+            // Permission is not granted ask for permissions
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    LOCATION_PERMISSION_REQUEST);
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -97,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 btnStartStop.setText(getString(R.string.btn_stop_service));
                 mRunning = true;
                 // TODO verify this
-                if(chkBoxAutoUpdate.isChecked() && autoUpdateTask == null){
+                if (chkBoxAutoUpdate.isChecked() && autoUpdateTask == null) {
                     scheduleAutoUpdate();
                 }
             }
@@ -111,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 btnStartStop.setText(getString(R.string.btn_start_service));
                 locationService = null;
                 mRunning = false;
-                if(autoUpdateTask != null){
+                if (autoUpdateTask != null) {
                     autoUpdateTask.cancel();
                 }
             }
@@ -123,14 +157,14 @@ public class MainActivity extends AppCompatActivity {
         if (chkBoxAutoUpdate.isChecked() && mRunning) {
             Log.i(TAG, "enableDisableAutoUpdate: Auto update enabled");
             scheduleAutoUpdate();
-        } else if(mRunning){
+        } else if (mRunning) {
             Log.i(TAG, "enableDisableAutoUpdate: Auto update disabled");
             // the timer should be cancelled
             autoUpdateTask.cancel();
         }
     }
 
-    private void scheduleAutoUpdate(){
+    private void scheduleAutoUpdate() {
         autoUpdateTask = new TimerTask() {
             @Override
             public void run() {
@@ -178,6 +212,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST:
+                if (grantResults.length == 3 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                        grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    Log.i(TAG, "onRequestPermissionsResult: Permission has been granted");
+                }
+                break;
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (locationService != null) {
@@ -207,19 +256,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return process;
     }
-
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            Log.d(TAG, "onServiceConnected: Service connected");
-            locationService = ILocationService.Stub.asInterface(iBinder);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            Log.d(TAG, "onServiceDisconnected: Service disconnected");
-            locationService = null;
-        }
-    };
 
 }

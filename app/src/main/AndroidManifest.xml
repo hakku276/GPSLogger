@@ -22,7 +22,7 @@
         <service
             android:name=".GPSLogger"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
