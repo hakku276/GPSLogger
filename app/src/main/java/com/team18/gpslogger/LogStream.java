@@ -17,7 +17,7 @@ import java.util.Locale;
 
 /**
  * The GPX Log Stream
- * Created by aanal on 6/8/17.
+ * Created by aanal on 6/10/18.
  */
 
 class LogStream {
